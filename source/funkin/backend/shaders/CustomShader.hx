@@ -17,7 +17,7 @@ class CustomShader extends FunkinShader {
 	/**
 	 * Creates a new custom shader
 	 * @param name Name of the frag and vert files.
-	 * @param glslVersion GLSL version to use. Defaults to `120`.
+	 * @param glslVersion GLSL version to use. Defaults to `100` in mobile, `120` in desktop.
 	 */
 	public function new(name:String, glslVersion:String = null) {
 		if (glslVersion == null) glslVersion = Flags.DEFAULT_GLSL_VERSION;

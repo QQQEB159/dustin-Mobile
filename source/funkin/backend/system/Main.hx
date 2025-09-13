@@ -28,20 +28,19 @@ import sys.thread.Thread;
 import android.content.Context;
 import android.os.Build;
 #end
+import lime.system.System as LimeSystem;
 
 class Main extends Sprite
 {
 	public static var instance:Main;
 
 	public static var modToLoad:String = "dustin";
-	public static var forceGPUOnlyBitmapsOff:Bool = #if desktop false #else true #end;
+	public static var forceGPUOnlyBitmapsOff:Bool = #if (desktop || mobile) false #else true #end;
 	public static var noTerminalColor:Bool = false;
 	public static var verbose:Bool = false;
 
 	public static var scaleMode:FunkinRatioScaleMode;
-	#if !mobile
 	public static var framerateSprite:funkin.backend.system.framerate.Framerate;
-	#end
 
 	var gameWidth:Int = 1280; // Width of the game in pixels (might be less / more in actual pixels).
 	var gameHeight:Int = 720; // Height of the game in pixels (might be less / more in actual pixels).
@@ -74,13 +73,27 @@ class Main extends Sprite
 
 		instance = this;
 
+		#if mobile
+		#if android
+		StorageUtil.requestPermissions();
+		#end
+		Sys.setCwd(StorageUtil.getStorageDirectory());
+		#end
+
 		CrashHandler.init();
+		
+		#if !web framerateSprite = new funkin.backend.system.framerate.Framerate(); #end
 
 		funkin.backend.system.framerate.Framerate.fontName = Paths.getFontName(Paths.font("DTM-Mono.ttf"));
 		addChild(game = new FunkinGame(gameWidth, gameHeight, MainState, Options.framerate, Options.framerate, skipSplash, startFullscreen));
 
-		#if (!mobile && !web)
-		addChild(framerateSprite = new funkin.backend.system.framerate.Framerate());
+		#if android FlxG.android.preventDefaultKeys = [BACK]; #end
+
+		#if !web
+		addChild(framerateSprite);
+		#if mobile
+		FlxG.stage.window.onResize.add((w:Int, h:Int) -> framerateSprite.setScale());
+		#end
 		SystemInfo.init();
 		#end
 	}
@@ -172,6 +185,9 @@ class Main extends Sprite
 		#end
 
 		initTransition();
+		#if mobile
+		LimeSystem.allowScreenTimeout = Options.screenTimeOut;
+		#end
 	}
 
 	public static function refreshAssets() @:privateAccess {
@@ -234,9 +250,7 @@ class Main extends Sprite
 		if (!noCwdFix && !sys.FileSystem.exists('manifest/default.json')) {
 			Sys.setCwd(haxe.io.Path.directory(Sys.programPath()));
 		}
-		#elseif android
-		Sys.setCwd(haxe.io.Path.addTrailingSlash(VERSION.SDK_INT > 30 ? Context.getObbDir() : Context.getExternalFilesDir()));
-		#elseif (ios || switch)
+		#elseif switch
 		Sys.setCwd(haxe.io.Path.addTrailingSlash(openfl.filesystem.File.applicationStorageDirectory.nativePath));
 		#end
 	}
