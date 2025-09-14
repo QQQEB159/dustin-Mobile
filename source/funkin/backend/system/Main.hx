@@ -81,10 +81,9 @@ class Main extends Sprite
 		#end
 
 		CrashHandler.init();
-		
+
 		#if !web framerateSprite = new funkin.backend.system.framerate.Framerate(); #end
 
-		funkin.backend.system.framerate.Framerate.fontName = Paths.getFontName(Paths.font("DTM-Mono.ttf"));
 		addChild(game = new FunkinGame(gameWidth, gameHeight, MainState, Options.framerate, Options.framerate, skipSplash, startFullscreen));
 
 		#if android FlxG.android.preventDefaultKeys = [BACK]; #end
@@ -171,7 +170,7 @@ class Main extends Sprite
 		FlxG.signals.preStateSwitch.add(onStateSwitch);
 		FlxG.signals.postStateSwitch.add(onStateSwitchPost);
 
-		FlxG.mouse.useSystemCursor = true;
+		FlxG.mouse.useSystemCursor = !Controls.instance.touchC;
 		#if DARK_MODE_WINDOW
 		if(funkin.backend.utils.NativeAPI.hasVersion("Windows 10")) funkin.backend.utils.NativeAPI.redrawWindowHeader();
 		#end

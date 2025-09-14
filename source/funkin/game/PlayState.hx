@@ -645,7 +645,6 @@ class PlayState extends MusicBeatState
 	@:dox(hide) override public function create()
 	{
 		#if mobile lime.system.System.allowScreenTimeout = false; #end
-		
 		Note.__customNoteTypeExists = [];
 
 		// SCRIPTING & DATA INITIALIZATION
@@ -877,19 +876,18 @@ class PlayState extends MusicBeatState
 		#end
 
 		startingSong = true;
-
 		#if TOUCH_CONTROLS
 		addHitbox();
 		addTouchPad('NONE', 'P');
 		addTouchPadCamera();
-		hitbox.visible = false;
+		hitbox.visible = true;
 		hitbox.forEachAlive((button) ->
 		{
 			if (touchPad.buttonP != null)			
 				button.deadZones.push(touchPad.buttonP);
 		});
 		#end
-		
+
 		super.create();
 
 		for(s in introSprites)
@@ -994,9 +992,6 @@ class PlayState extends MusicBeatState
 		}
 
 		startedCountdown = true;
-		#if TOUCH_CONTROLS
-		hitbox.visible = true;
-		#end
 		Conductor.songPosition = 0;
 		Conductor.songPosition -= Conductor.crochet * introLength - Conductor.songOffset;
 
@@ -1077,8 +1072,8 @@ class PlayState extends MusicBeatState
 	}
 
 	public override function destroy() {
-		#if mobile lime.system.System.allowScreenTimeout = Options.screenTimeOut; #end
 		scripts.call("destroy");
+		#if mobile lime.system.System.allowScreenTimeout = Options.screenTimeOut; #end
 		for(g in __cachedGraphics)
 			g.useCount--;
 		@:privateAccess {
@@ -1168,9 +1163,9 @@ class PlayState extends MusicBeatState
 	@:dox(hide)
 	override function openSubState(SubState:FlxSubState)
 	{
-		#if mobile lime.system.System.allowScreenTimeout = Options.screenTimeOut; #end
-		
 		var event = gameAndCharsEvent("onSubstateOpen", EventManager.get(StateEvent).recycle(SubState));
+
+		#if mobile lime.system.System.allowScreenTimeout = Options.screenTimeOut; #end
 
 		if (!postCreated)
 			MusicBeatState.skipTransIn = true;
@@ -1196,9 +1191,8 @@ class PlayState extends MusicBeatState
 	@:dox(hide)
 	override function closeSubState()
 	{
+		var event = scripts.event("onSubstateClose", EventManager.get(StateEvent).recycle(subState));
 		#if mobile lime.system.System.allowScreenTimeout = false; #end
-		
-		var event = gameAndCharsEvent("onSubstateClose", EventManager.get(StateEvent).recycle(subState));
 		if (event.cancelled) return;
 
 		if (paused)
@@ -1429,7 +1423,7 @@ class PlayState extends MusicBeatState
 		while(events.length > 0 && events.last().time <= Conductor.songPosition)
 			executeEvent(events.pop());
 
-		if (controls.PAUSE && startedCountdown && canPause)
+		if (#if android FlxG.android.justReleased.BACK || #end controls.PAUSE && startedCountdown && canPause)
 			pauseGame();
 
 		if (generatedMusic)
@@ -1759,7 +1753,6 @@ class PlayState extends MusicBeatState
 		#if TOUCH_CONTROLS
 		hitbox.visible = false;
 		#end
-		
 		if (isStoryMode) {
 			campaignScore += songScore;
 			campaignMisses += misses;
@@ -1834,7 +1827,10 @@ class PlayState extends MusicBeatState
 
 		var event:NoteMissEvent = gameAndCharsEvent("onPlayerMiss", EventManager.get(NoteMissEvent).recycle(note, -10, 1, muteVocalsOnMiss, note != null ? -0.0475 : -0.04, Paths.sound(FlxG.random.getObject(Flags.DEFAULT_MISS_SOUNDS)), FlxG.random.float(0.1, 0.2), note == null, combo > 5, "sad", true, true, "miss", strumLines.members[playerID].characters, playerID, note != null ? note.noteType : null, directionID, 0));
 		strumLine.onMiss.dispatch(event);
-		if (event.cancelled) return;
+		if (event.cancelled) {
+			gameAndCharsEvent("onPostPlayerMiss", event);
+			return;
+		}
 
 		if (strumLine != null) strumLine.addHealth(event.healthGain);
 		if (gf != null && event.gfSad && gf.hasAnimation(event.gfSadAnim))
@@ -1870,6 +1866,8 @@ class PlayState extends MusicBeatState
 
 		if (event.deleteNote && strumLine != null && note != null)
 			strumLine.deleteNote(note);
+
+		gameAndCharsEvent("onPostPlayerMiss", event);
 	}
 
 	@:dox(hide)
@@ -1979,7 +1977,7 @@ class PlayState extends MusicBeatState
 		var suf:String = hasEvent ? evt.ratingSuffix : "";
 
 		var rating:FlxSprite = comboGroup.recycleLoop(FlxSprite);
-		rating.resetSprite(comboGroup.x + -40, comboGroup.y + -60);
+		CoolUtil.resetSprite(rating, comboGroup.x + -40, comboGroup.y + -60);
 		rating.loadAnimatedGraphic(Paths.image('${pre}${myRating}${suf}'));
 		rating.acceleration.y = 550;
 		rating.velocity.y -= FlxG.random.int(140, 175);
@@ -2006,7 +2004,7 @@ class PlayState extends MusicBeatState
 
 			if (evt.displayCombo) {
 				var comboSpr:FlxSprite = comboGroup.recycleLoop(FlxSprite).loadAnimatedGraphic(Paths.image('${pre}combo${suf}'));
-				comboSpr.resetSprite(comboGroup.x, comboGroup.y);
+				CoolUtil.resetSprite(comboSpr, comboGroup.x, comboGroup.y);
 				comboSpr.acceleration.y = 600;
 				comboSpr.velocity.y -= 150;
 				comboSpr.velocity.x += FlxG.random.int(1, 10);
@@ -2030,7 +2028,7 @@ class PlayState extends MusicBeatState
 			for (i in 0...separatedScore.length)
 			{
 				var numScore:FlxSprite = comboGroup.recycleLoop(FlxSprite).loadAnimatedGraphic(Paths.image('${pre}num${separatedScore.charAt(i)}${suf}'));
-				numScore.resetSprite(comboGroup.x + (43 * i) - 90, comboGroup.y + 80);
+				CoolUtil.resetSprite(numScore, comboGroup.x + (43 * i) - 90, comboGroup.y + 80);
 				if (hasEvent) {
 					numScore.antialiasing = evt.numAntialiasing;
 					numScore.scale.set(evt.numScale, evt.numScale);

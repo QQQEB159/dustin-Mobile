@@ -28,12 +28,6 @@ class MemoryCounter extends Sprite {
 			addChild(label);
 		}
 		memoryPeakText.alpha = 0.5;
-
-		this.memoryText.antiAliasType = ADVANCED;
-        this.memoryText.sharpness = 400/*MAX ON OPENFL*/;
-
-		this.memoryPeakText.antiAliasType = ADVANCED;
-        this.memoryPeakText.sharpness = 400/*MAX ON OPENFL*/;
 	}
 
 	public function reload() {}

@@ -21,7 +21,7 @@ class Framerate extends Sprite {
 	public static var codenameBuildField:CodenameBuildField;
 	#end
 
-	public static var fontName:String = null;
+	public static var fontName:String = openfl.utils.Assets.getFont("assets/fonts/DTM-Mono.ttf").fontName;
 
 	/**
 	 * 0: FPS INVISIBLE
@@ -47,7 +47,7 @@ class Framerate extends Sprite {
 	#if android public var presses:Int = 0; #end
 	public var sillyTimer:FlxTimer = new FlxTimer();
 	#end
-	
+
 	public function new() {
 		super();
 		if (instance != null) throw "Cannot create another instance";
@@ -116,7 +116,6 @@ class Framerate extends Sprite {
 	public override function __enterFrame(t:Float) {
 		alpha = CoolUtil.fpsLerp(alpha, debugMode > 0 ? 1 : 0, 0.5);
 		debugAlpha = CoolUtil.fpsLerp(debugAlpha, debugMode > 1 ? 1 : 0, 0.5);
-		
 		#if android
 		if(FlxG.android.justReleased.BACK){
 			sillyTimer.cancel();
@@ -176,7 +175,7 @@ class Framerate extends Sprite {
 			y = c.y + c.height + 4;
 		}
 	}
-	
+
 	#if mobile
 	public inline function setScale(?scale:Float){
 		if(scale == null)

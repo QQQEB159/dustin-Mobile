@@ -25,12 +25,6 @@ class FramerateCounter extends Sprite {
 			label.selectable = false;
 			addChild(label);
 		}
-
-		this.fpsNum.antiAliasType = ADVANCED;
-        this.fpsNum.sharpness = 400/*MAX ON OPENFL*/;
-
-		this.fpsLabel.antiAliasType = ADVANCED;
-        this.fpsLabel.sharpness = 400/*MAX ON OPENFL*/;
 	}
 
 	public function reload() {}

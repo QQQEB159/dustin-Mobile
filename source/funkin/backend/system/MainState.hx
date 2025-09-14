@@ -3,10 +3,10 @@ package funkin.backend.system;
 #if MOD_SUPPORT
 import sys.FileSystem;
 #end
+import flixel.FlxState;
 #if mobile
 import mobile.funkin.backend.system.CopyState;
 #end
-import flixel.FlxState;
 import funkin.backend.assets.AssetsLibraryList;
 import funkin.backend.assets.ModsFolder;
 import funkin.backend.assets.ModsFolderLibrary;
@@ -90,12 +90,12 @@ class MainState extends FlxState {
 			)
 		];
 
-		for(path in addonPaths) {
+		for (path in addonPaths) {
 			if (path == null) continue;
 			if (!isDirectory(path)) continue;
 
-			for(addon in FileSystem.readDirectory(path)) {
-				if(!FileSystem.isDirectory(path + addon)) {
+			for (addon in FileSystem.readDirectory(path)) {
+				if (!FileSystem.isDirectory(path + addon)) {
 					switch(Path.extension(addon).toLowerCase()) {
 						case 'zip':
 							addon = Path.withoutExtension(addon);
@@ -114,7 +114,14 @@ class MainState extends FlxState {
 				else _noPriorityAddons.insert(0, data);
 			}
 		}
+		#end
 
+		#if GLOBAL_SCRIPT
+		funkin.backend.scripting.GlobalScript.destroy();
+		#end
+		funkin.backend.scripting.Script.staticVariables.clear();
+
+		#if MOD_SUPPORT
 		for (addon in _lowPriorityAddons)
 			loadLib(addon.path, ltrim(addon.name, "[LOW]"));
 
@@ -150,8 +157,6 @@ class MainState extends FlxState {
 		#if sys
 		CoolUtil.safeAddAttributes('.temp/', NativeAPI.FileAttribute.HIDDEN);
 		#end
-
-		FlxG.game.soundTray.reloadText(true);
 
 		var startState:Class<FlxState> = Flags.DISABLE_WARNING_SCREEN ? TitleState : funkin.menus.WarningState;
 
