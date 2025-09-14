@@ -2,11 +2,30 @@ package funkin.options.categories;
 
 import flixel.input.keyboard.FlxKey;
 import lime.system.System as LimeSystem;
+#if android
+import mobile.funkin.backend.utils.StorageUtil;
+#end
+#if sys
+import sys.io.File;
+#end
 
 class MobileOptions extends TreeMenuScreen
 {
+	#if android
+	final lastStorageType:String = Options.storageType;
+	var externalPaths:Array<String> = StorageUtil.checkExternalPaths(true);
+	var typeNames:Array<String> = ['Data', 'Obb', 'Media', 'External'];
+	var typeVars:Array<String> = ['EXTERNAL_DATA', 'EXTERNAL_OBB', 'EXTERNAL_MEDIA', 'EXTERNAL'];
+	#end
 	public function new()
 	{ 
+		#if android
+		if (!externalPaths.contains('\n'))
+		{
+			typeNames = typeNames.concat(externalPaths);
+			typeVars = typeVars.concat(externalPaths);
+		}
+		#end
 		super('optionsTree.mobile-name', 'optionsTree.mobile-name', 'MobileOptions.', ['LEFT_FULL', 'A_B']);
 
 		#if TOUCH_CONTROLS
@@ -44,5 +63,38 @@ class MobileOptions extends TreeMenuScreen
 			LimeSystem.allowScreenTimeout = Options.screenTimeOut;
 		}));
 		#end
+		#if android
+		add(new ArrayOption(getNameID('storageType'), getDescID('storageType'),
+			typeVars,
+			typeNames,
+			'storageType'));
+		#end
 	}
+	
+	override public function destroy() {
+		#if android
+		if (lastStorageType != Options.storageType) {
+			onStorageChange();
+			funkin.backend.utils.NativeAPI.showMessageBox('Notice!', 'Storage Type has been changed and you needed restart the game!!\nPress OK to close the game.');
+			LimeSystem.exit(0);
+		}
+		#end
+	}
+	
+	#if android
+	function onStorageChange():Void
+	{
+		File.saveContent(LimeSystem.applicationStorageDirectory + 'storagetype.txt', Options.storageType);
+	
+		var lastStoragePath:String = StorageType.fromStrForce(lastStorageType) + '/';
+	
+		try
+		{
+			if (Options.storageType != "EXTERNAL")
+				Sys.command('rm', ['-rf', lastStoragePath]);
+		}
+		catch (e:haxe.Exception)
+			trace('Failed to remove last directory. (${e.message})');
+	}
+	#end
 }

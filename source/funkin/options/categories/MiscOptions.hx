@@ -1,6 +1,7 @@
 package funkin.options.categories;
 
 import funkin.savedata.FunkinSave;
+import funkin.backend.assets.ModsFolder;
 
 class MiscOptions extends TreeMenuScreen {
 	public function new() {

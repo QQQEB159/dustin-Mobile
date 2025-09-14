@@ -158,6 +158,8 @@ class MainState extends FlxState {
 		CoolUtil.safeAddAttributes('.temp/', NativeAPI.FileAttribute.HIDDEN);
 		#end
 
+		FlxG.game.soundTray.reloadText(true);
+		
 		var startState:Class<FlxState> = Flags.DISABLE_WARNING_SCREEN ? TitleState : funkin.menus.WarningState;
 
 		if (Options.devMode && Options.allowConfigWarning) {
