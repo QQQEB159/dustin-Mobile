@@ -60,6 +60,7 @@ class VideoCutscene extends Cutscene {
 
 		add(video = new FlxVideoSprite());
 		video.antialiasing = true;
+		video.autoPause = false;  // Imma handle it better inside this class, mainly because of the pause menu  - Nex
 		video.bitmap.onEndReached.add(close);
 		video.bitmap.onFormatSetup.add(function() if (video.bitmap != null && video.bitmap.bitmapData != null) {
 			final width = video.bitmap.bitmapData.width;
@@ -103,7 +104,7 @@ class VideoCutscene extends Cutscene {
 			if (localPath.startsWith("[ZIP]")) {
 				// ZIP PATH: EXPORT
 				// TODO: this but better and more ram friendly
-				localPath = '.temp/video-${curVideo++}.mp4';
+				localPath = './.temp/video-${curVideo++}.mp4';
 				File.saveBytes(localPath, Assets.getBytes(path));
 			}
 
