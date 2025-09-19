@@ -166,12 +166,6 @@
 		<assets path='mods' rename='mods' embed='false' />
 	</section>
 
-	<!-- OpenAL config -->
-	<section if="desktop">
-		<assets path="alsoft.txt" rename="plugins/alsoft.ini" type="text" if="windows"/>
-		<assets path="alsoft.txt" rename="plugins/alsoft.conf" type="text" unless="windows"/>
-	</section>
-
 	<!-- ______________________________ Haxedefines _____________________________ -->
 
 	<haxeflag name="--macro" value="funkin.backend.system.macros.BuildInfo.printBuildInfo()" />
@@ -242,7 +236,7 @@
 	<!-- Do whatever you want I'm tired uninstall and install everytime -->
 	<certificate path="key.keystore" password="codenameengine" alias="cneport" alias-password="codenameengine" if="android" unless="debug" />
 
-	<haxedef name="SHARE_MOBILE_FILES" if="ios" />
+	<haxedef name="SHARE_MOBILE_FILES" if="mobile" />
 
 	<!-- Category Type for Apple Systems -->
 	<config:ios category_type="public.app-category.music-games" />
