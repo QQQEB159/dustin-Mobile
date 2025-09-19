@@ -58,6 +58,7 @@ class OptionType extends FlxSpriteGroup implements ITreeOption {
 	}
 
 	public function changeSelection(change:Int) {}
+	public function onChangeSelection(change:Float) {}
 	public function select() {}
 
 	override function get_height() return itemHeight;
