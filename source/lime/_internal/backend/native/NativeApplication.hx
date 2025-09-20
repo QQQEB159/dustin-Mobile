@@ -106,9 +106,8 @@ class NativeApplication
 		if (pauseTimer > -1)
 		{
 			var offset = System.getTimer() - pauseTimer;
-			for (timer in Timer.sRunningTimers)
-			{
-				if (timer.mRunning) timer.mFireAt += offset;
+			for(timer in Timer.sRunningTimers) {
+				if(timer != null && timer.mRunning) timer.mFireAt += offset;
 			}
 			pauseTimer = -1;
 		}
@@ -627,11 +626,14 @@ class NativeApplication
 		if (Timer.sRunningTimers.length > 0)
 		{
 			var currentTime = System.getTimer();
-			var foundStopped = false;
+			var foundNull = false;
+			var timer;
 
-			for (timer in Timer.sRunningTimers)
+			for (i in 0...Timer.sRunningTimers.length)
 			{
-				if (timer.mRunning)
+				timer = Timer.sRunningTimers[i];
+
+				if (timer != null && timer.mRunning)
 				{
 					if (currentTime >= timer.mFireAt)
 					{
@@ -641,15 +643,15 @@ class NativeApplication
 				}
 				else
 				{
-					foundStopped = true;
+					foundNull = true;
 				}
 			}
 
-			if (foundStopped)
+			if (foundNull)
 			{
 				Timer.sRunningTimers = Timer.sRunningTimers.filter(function(val)
 				{
-					return val.mRunning;
+					return val != null && val.mRunning;
 				});
 			}
 		}
